@@ -24,8 +24,7 @@ def common_element_priorities(string_list:list)->list:
     alpha = string.ascii_letters[:52]
     score = 0
     for x in common:
-        # alphabet priority starts at 1, unlike index, so +1
-        score += alpha.find(x) + 1
+        score += alpha.find(x) + 1  # priority starts at 1 not 0, so +1
     return score
 
 def part_one_score(bags:list)->int:
