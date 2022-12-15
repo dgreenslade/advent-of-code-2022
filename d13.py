@@ -14,7 +14,7 @@ def signal_input(file:set) -> list:
         signal.append(pair)
         return signal
         
-def recurse_compare(left:list, right:list) -> bool:
+def recurse_compare(left, right):
     """ 
     Compare two lists, uses rules to determine whether in 
     correct order (i.e. left < right)
@@ -67,6 +67,7 @@ def sort_signals(signal_list:list[list]) -> list:
                     pass # incoming is < present, continue checking down list
             sorted_signals.insert(insert_idx, sig1)
     return sorted_signals
+
 
 
 def main():
