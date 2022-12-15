@@ -1,7 +1,6 @@
 import ast
-import itertools
 
-def signal_input(file:set) -> None:
+def signal_input(file:set) -> list:
     signal = []
     with open(file) as f:
         # return f.readlines()
@@ -15,47 +14,35 @@ def signal_input(file:set) -> None:
         signal.append(pair)
         return signal
         
-def recurse_compare(left, right):
-    # print(f'Comparing {left} -- {right}')
+def recurse_compare(left:list, right:list) -> bool:
+    """ 
+    Compare two lists, uses rules to determine whether in 
+    correct order (i.e. left < right)
+    """
+
     if right and not left:
-        # print('....ran out of elements')
         return True
     elif left and not right:
-        # print('....ran out of elements')
         return False 
     for idx1, l in enumerate(left):
         for idx2, r in enumerate(right):
             if idx1==idx2:
-                # print(f'..interior camprison {l} & {r}')
-                # If ints - compare 
+                # If both ints - compare 
                 if type(l) == int and type(r) == int:
                     if l < r:
-                        # print('....numeric order')
                         return True
                     elif l > r:
-                        # print('....numeric order')
                         return False
-                 # If not both ints, recurse in 
-                elif type(l) == list and type(r) == list:
-                    res = recurse_compare(l, r)
+                else:  # If not both ints, recurse into
+                    ints_2_list = lambda x : [x] if type(x) == int else x
+                    res = recurse_compare(ints_2_list(l), ints_2_list(r))
                     if res is not None:
                         return res 
-                elif type(l) == int and type(r) == list: 
-                    res = recurse_compare([l], r)
-                    if res is not None:
-                        return res 
-                elif type(l) == list and type(r) == int:
-                    res = recurse_compare(l, [r])
-                    if res is not None:
-                        return res 
-    # Having compared component values, now if one list is bigger
+    # Having compared component values, now if one list is longer
     if len(left) < len(right):
-        # print('....ran out of elements')
         return True
     elif len(left) > len(right):
-        # print('....ran out of elements')
         return False
-
 
 def sort_signals(signal_list:list[list]) -> list:
     """
@@ -68,18 +55,20 @@ def sort_signals(signal_list:list[list]) -> list:
         if idx1 == 0:
             sorted_signals.append(sig1)
         else:
+            insert_idx = None
             # Sort - go from highest value (-1) and contine down if less
             for i in range(len(sorted_signals),0,-1):
                 if recurse_compare(sorted_signals[i-1], sig1):
+                    insert_idx = i
                     break # incoming > present & highest in list. Insert one index above here
                 elif i == 1:
-                    break # incoming < lowest in list. Insert one at start
+                    insert_idx = 0
+                    break # Passed against smallest. So nsert new at start
                 else:
                     pass # incoming is < present, continue checking down list
-            sorted_signals.insert(i, sig1)
+            sorted_signals.insert(insert_idx, sig1)
     return sorted_signals
-
-
+    
 
 def main():
     signal = signal_input('./data/d13.txt')
@@ -100,7 +89,6 @@ def main():
             score += idx + 1
     print(f'--Part 1\nSum of indices of lines in correct order: {score}')
 
-
     ## Part 2
     # Combine all signals into single list rather than pairs
     all_signals = []
@@ -114,7 +102,7 @@ def main():
     # find distress packes:
     distress_1 = sorted_signals.index([[2]]) + 1
     distress_2 = sorted_signals.index([[6]]) + 1
-    print(f'--Part 2\nProduct of indices of two distress signals insorted signal: {distress_1 * distress_2}')
+    print(f'--Part 2\nProduct of indices (+1) of two distress signals in sorted signal: {distress_1 * distress_2}')
 
 if __name__ == '__main__':
     main()
